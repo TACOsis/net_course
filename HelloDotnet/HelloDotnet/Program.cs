@@ -34,18 +34,18 @@ class Program
                 continue;
             };
             
-            AddCategory(current_catigory, current_catigory_value);
+            Add_category(current_catigory, current_catigory_value);
+            Calculate_total_sum_catigories();
+            Calculate_popular_catigories();
+            
         }
-
-        foreach (var catigory in Catigories)
-        {
-            Console.WriteLine($"{catigory.Key}: {catigory.Value}");
-        }
+        
+        PrintCatigories();
 
         Console.WriteLine(JsonConvert.SerializeObject(Catigories, Formatting.Indented));
     }
 
-    static void AddCategory(string catigory_name, decimal catigory_value)
+    static void Add_category(string catigory_name, decimal catigory_value)
     {
         if (Catigories.ContainsKey(catigory_name))
         {
@@ -57,14 +57,40 @@ class Program
         }
     }
 
+    static async Task Calculate_total_sum_catigories()
+    {
+        total_sum_catigories = 0;
+        foreach (var catigory in Catigories)
+        {
+            total_sum_catigories += catigory.Value;
+        }
+    }
+
+    static async Task Calculate_popular_catigories()
+    {
+        string current_popular_catigory = Catigories.First().Key;
+        foreach (var catigory in Catigories)
+        {
+            if (Catigories[current_popular_catigory] < catigory.Value)
+            {
+                current_popular_catigory = catigory.Key;
+            }
+            continue;
+        }
+        popular_catigory = current_popular_catigory;
+        
+    }
+
     static void PrintCatigories()
     {
-        Console.WriteLine("Категория      Сумма\n" +
-                          "еда          2000.50\n" +
-                          "транспорт     450.00\n" +
-                          "--------------------\n" +
-                          $"Итого        {total_sum_catigories}\n" +
-                          $"Больше всего: {popular_catigory}");
+        Console.WriteLine($"{"Категория", -15}        {"Сумма", 10}t" );
+        foreach (var catigory in Catigories)
+        {
+            Console.WriteLine($"{catigory.Key, -15} {catigory.Value, 18:F2}");
+        }
+        Console.WriteLine(new string('-', 35));
+        Console.WriteLine($"{"Итоги:", -15}       {total_sum_catigories, 10:F2}");
+        Console.WriteLine($"{"Больше всего:", -15}      {popular_catigory, 10:F2}");
     }
 }
 
