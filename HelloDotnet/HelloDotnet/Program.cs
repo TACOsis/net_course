@@ -3,7 +3,9 @@ using Newtonsoft.Json;
 
 class Program
 {
-    public static Dictionary<string, decimal> Catigories =  new Dictionary<string, decimal>();
+    static Dictionary<string, decimal> Catigories =  new Dictionary<string, decimal>();
+    static decimal total_sum_catigories = 0; 
+    static string popular_catigory = "";
     static void Main(string[] args)
     {
         while (true)
@@ -35,10 +37,15 @@ class Program
             AddCategory(current_catigory, current_catigory_value);
         }
 
+        foreach (var catigory in Catigories)
+        {
+            Console.WriteLine($"{catigory.Key}: {catigory.Value}");
+        }
+
         Console.WriteLine(JsonConvert.SerializeObject(Catigories, Formatting.Indented));
     }
 
-    public static void AddCategory(string catigory_name, decimal catigory_value)
+    static void AddCategory(string catigory_name, decimal catigory_value)
     {
         if (Catigories.ContainsKey(catigory_name))
         {
@@ -48,6 +55,16 @@ class Program
         {
             Catigories.Add(catigory_name, catigory_value);
         }
+    }
+
+    static void PrintCatigories()
+    {
+        Console.WriteLine("Категория      Сумма\n" +
+                          "еда          2000.50\n" +
+                          "транспорт     450.00\n" +
+                          "--------------------\n" +
+                          $"Итого        {total_sum_catigories}\n" +
+                          $"Больше всего: {popular_catigory}");
     }
 }
 
