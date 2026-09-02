@@ -4,10 +4,10 @@ namespace HelloDotnet;
 
 class Program
 {
-    private static readonly Dictionary<string, decimal> Categories = new Dictionary<string, decimal>();
-
     static void Main()
     {
+        Dictionary<string, decimal> categories = new Dictionary<string, decimal>();
+        
         while (true)
         {
             var line = Console.ReadLine() ?? "";
@@ -30,59 +30,62 @@ class Program
                 continue;
             }
 
-            AddCategory(currentCategory, currentCategoryValue);
+            AddExpense(categories, currentCategory, currentCategoryValue);
         }
         
-        var totalSumCategories = CalculateCategory();
-        var popularCategory =  PopularCategory();
-        
-        PrintCategories(popularCategory, totalSumCategories);
+        var totalSumCategories = CalculateTotal(categories);
+        var popularCategory = FindTopCategory(categories) ?? "нет данных";
+
+        PrintCategories(categories, popularCategory, totalSumCategories);
     }
 
-    static void AddCategory(string categoryName, decimal categoryValue)
+    static void AddExpense(Dictionary<string, decimal> categories, string categoryName, decimal categoryValue)
     {
-        if (!Categories.TryAdd(categoryName, categoryValue))
+        if (!categories.TryAdd(categoryName, categoryValue))
         {
-            Categories[categoryName] += categoryValue;
+            categories[categoryName] += categoryValue;
         }
     }
 
-    private static decimal CalculateCategory()
+    private static decimal CalculateTotal(Dictionary<string, decimal> categories)
     {
         decimal totalSumCategories = 0.0m;
-        foreach (var category in Categories)
+        foreach (var category in categories)
         {
             totalSumCategories += category.Value;
+            totalSumCategories += category.Value;
         }
-        
         return totalSumCategories; 
     }
 
-    private static string PopularCategory()
+    private static string? FindTopCategory(Dictionary<string, decimal> categories)
     {
-        var currentPopularCategory = Categories.FirstOrDefault().Key ?? string.Empty;
-        foreach (var category in Categories)
+        var currentPopularCategory = categories.FirstOrDefault().Key;
+        
+        foreach (var category in categories)
         {
-            if (Categories[currentPopularCategory] < category.Value) 
+            if (categories[currentPopularCategory] < category.Value) 
             {
-                    currentPopularCategory = category.Key;
+                currentPopularCategory = category.Key;
             }
         }
 
         return currentPopularCategory;
-        
     }
 
-    private static void PrintCategories(string popularCategory, decimal totalSumCategories)
+    private static void PrintCategories(Dictionary<string, decimal> categories, string popularCategory, decimal totalSumCategories)
     {
-        Console.WriteLine($"{"Категория",-15}{"Сумма",10}");
-        foreach (var category in Categories)
-        {
-            Console.WriteLine($"{category.Key,-15}{category.Value,10:F2}");
-        }
+        const int leftColumn = -15;
+        const int rightColumn = 10;
+        int lineWidthRow = Math.Abs(leftColumn - rightColumn);
 
-        Console.WriteLine(new string('-', 25));
-        Console.WriteLine($"{"Итоги:",-15}{totalSumCategories,10:F2}");
-        Console.WriteLine($"{"Больше всего:",-15}{popularCategory,10}");
+        Console.WriteLine($"{"Категория",leftColumn}{"Сумма",rightColumn}");
+        foreach (var category in categories)
+        {
+            Console.WriteLine($"{category.Key,leftColumn}{category.Value,rightColumn:F2}");
+        }
+        Console.WriteLine(new string('-', lineWidthRow));
+        Console.WriteLine($"{"Итоги:",leftColumn}{totalSumCategories,rightColumn:F2}");
+        Console.WriteLine($"{"Больше всего:",leftColumn}{popularCategory,rightColumn}");
     }
 }
