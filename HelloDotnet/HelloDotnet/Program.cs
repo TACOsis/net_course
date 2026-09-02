@@ -5,8 +5,6 @@ namespace HelloDotnet;
 class Program
 {
     private static readonly Dictionary<string, decimal> Categories = new Dictionary<string, decimal>();
-    private static decimal _totalSumCategories;
-    private static string _popularCategory = "";
 
     static void Main()
     {
@@ -28,19 +26,19 @@ class Program
 
             var currentCategory = splitLine[0];
 
-            if (!decimal.TryParse(splitLine[1], out var currentCategoryValue))
+            if (!decimal.TryParse(splitLine[1], CultureInfo.DefaultThreadCurrentCulture ,out var currentCategoryValue))
             {
                 Console.WriteLine($"Не понял сумму {splitLine[1]}. Формат: категория сумма");
                 continue;
             }
 
             AddCategory(currentCategory, currentCategoryValue);
-            CalculateTotalSumCategories();
-            CalculatePopularCategories();
-
         }
-
-        PrintCategories();
+        
+        var totalSumCategories = CalculateTotalSumCategories();
+        var popularCategory =  CalculatePopularCategories();
+        
+        PrintCategories(popularCategory, totalSumCategories);
     }
 
     static void AddCategory(string categoryName, decimal categoryValue)
@@ -51,16 +49,18 @@ class Program
         }
     }
 
-    private static void CalculateTotalSumCategories()
+    private static decimal CalculateTotalSumCategories()
     {
-        _totalSumCategories = 0;
+        decimal totalSumCategories = 0.0m;
         foreach (var category in Categories)
         {
-            _totalSumCategories += category.Value;
+            totalSumCategories += category.Value;
         }
+        
+        return totalSumCategories; 
     }
 
-    private static void CalculatePopularCategories()
+    private static string CalculatePopularCategories()
     {
         var currentPopularCategory = Categories.FirstOrDefault().Key;
         foreach (var category in Categories)
@@ -71,20 +71,20 @@ class Program
             }
         }
 
-        _popularCategory = currentPopularCategory;
+        return currentPopularCategory;
         
     }
 
-    private static void PrintCategories()
+    private static void PrintCategories(string popularCategory, decimal totalSumCategories)
     {
-        Console.WriteLine($"{"Категория",-15}        {"Сумма",10}t");
+        Console.WriteLine($"{"Категория",-15}{"Сумма",10}");
         foreach (var category in Categories)
         {
-            Console.WriteLine($"{category.Key,-15} {category.Value,18:F2}");
+            Console.WriteLine($"{category.Key,-15}{category.Value,10:F2}");
         }
 
-        Console.WriteLine(new string('-', 35));
-        Console.WriteLine($"{"Итоги:",-15}       {_totalSumCategories,10:F2}");
-        Console.WriteLine($"{"Больше всего:",-15}      {_popularCategory,10}");
+        Console.WriteLine(new string('-', 25));
+        Console.WriteLine($"{"Итоги:",-15}{totalSumCategories,10:F2}");
+        Console.WriteLine($"{"Больше всего:",-15}{popularCategory,10}");
     }
 }
