@@ -26,7 +26,7 @@ class Program
 
             if (!decimal.TryParse(splitLine[1], CultureInfo.InvariantCulture ,out var currentCategoryValue) || currentCategoryValue <= 0)
             {
-                Console.WriteLine($"Не понял сумму {splitLine[1]}. Формат: категория сумма");
+                Console.WriteLine($"Не понял сумму {splitLine[1]}. Сумма не может быть отрицательной или состоять из букв.");
                 continue;
             }
 
@@ -74,9 +74,10 @@ class Program
 
     private static void PrintCategories(IReadOnlyDictionary<string, decimal> categories, string popularCategory, decimal totalSumCategories)
     {
+        const int countColumn = 3;
         const int leftColumn = -15;
         const int rightColumn = 10;
-        int lineWidthRow = Math.Abs(leftColumn) - rightColumn;
+        int lineWidthRow = Math.Abs(leftColumn) + (rightColumn * (countColumn - 1));
         decimal sumPrecentCategories = 0;
 
         Console.WriteLine($"{"Категория",leftColumn}{"Сумма",rightColumn}{"Процент", rightColumn}");
@@ -96,7 +97,7 @@ class Program
             Console.WriteLine($"{100 - sumPrecentCategories,rightColumn:F2}%");
         }
         Console.WriteLine(new string('-', lineWidthRow));
-        Console.WriteLine($"{"Итоги:",leftColumn}{totalSumCategories,rightColumn:F2}");
+        Console.WriteLine($"{"Итого:",leftColumn}{totalSumCategories,rightColumn:F2}");
         Console.WriteLine($"{"Больше всего:",leftColumn}{popularCategory,rightColumn}");
     }
 }
