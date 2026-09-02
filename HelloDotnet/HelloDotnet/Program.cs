@@ -47,18 +47,17 @@ class Program
         }
     }
 
-    private static decimal CalculateTotal(Dictionary<string, decimal> categories)
+    private static decimal CalculateTotal(IReadOnlyDictionary<string, decimal> categories)
     {
-        decimal totalSumCategories = 0.0m;
+        decimal totalSumCategories = 0m;
         foreach (var category in categories)
         {
-            totalSumCategories += category.Value;
-            totalSumCategories += category.Value;
+            totalSumCategories += category.Value; 
         }
         return totalSumCategories; 
     }
 
-    private static string? FindTopCategory(Dictionary<string, decimal> categories)
+    private static string? FindTopCategory(IReadOnlyDictionary<string, decimal> categories)
     {
         var currentPopularCategory = categories.FirstOrDefault().Key;
         
@@ -73,16 +72,28 @@ class Program
         return currentPopularCategory;
     }
 
-    private static void PrintCategories(Dictionary<string, decimal> categories, string popularCategory, decimal totalSumCategories)
+    private static void PrintCategories(IReadOnlyDictionary<string, decimal> categories, string popularCategory, decimal totalSumCategories)
     {
         const int leftColumn = -15;
         const int rightColumn = 10;
-        int lineWidthRow = Math.Abs(leftColumn - rightColumn);
+        int lineWidthRow = Math.Abs(leftColumn) - rightColumn;
+        decimal sumPrecentCategories = 0;
 
-        Console.WriteLine($"{"Категория",leftColumn}{"Сумма",rightColumn}");
+        Console.WriteLine($"{"Категория",leftColumn}{"Сумма",rightColumn}{"Процент", rightColumn}");
         foreach (var category in categories)
         {
-            Console.WriteLine($"{category.Key,leftColumn}{category.Value,rightColumn:F2}");
+            Console.Write($"{category.Key,leftColumn}{category.Value,rightColumn:F2}");
+            
+            decimal currentPercent = (category.Value / totalSumCategories * 100);
+            
+            if ((categories.LastOrDefault().Key ?? "") != category.Key)
+            {
+                sumPrecentCategories += currentPercent;
+                Console.WriteLine($"{currentPercent,rightColumn:F2}%");
+                continue;
+            }
+
+            Console.WriteLine($"{100 - sumPrecentCategories,rightColumn:F2}%");
         }
         Console.WriteLine(new string('-', lineWidthRow));
         Console.WriteLine($"{"Итоги:",leftColumn}{totalSumCategories,rightColumn:F2}");
