@@ -1,10 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "ch4H5NlkzKo=",
+  "dgSpecHash": "NAfibO7/vco=",
   "success": true,
   "projectFilePath": "/Users/vryzhov/dotnet_course/HelloDotnet/HelloDotnet/HelloDotnet.csproj",
-  "expectedPackageFiles": [
-    "/Users/vryzhov/.nuget/packages/newtonsoft.json/13.0.5-beta1/newtonsoft.json.13.0.5-beta1.nupkg.sha512"
-  ],
+  "expectedPackageFiles": [],
   "logs": []
 }

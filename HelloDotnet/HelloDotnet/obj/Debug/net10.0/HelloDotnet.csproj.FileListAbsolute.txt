@@ -12,6 +12,3 @@
 /Users/vryzhov/dotnet_course/HelloDotnet/HelloDotnet/obj/Debug/net10.0/HelloDotnet.pdb
 /Users/vryzhov/dotnet_course/HelloDotnet/HelloDotnet/obj/Debug/net10.0/HelloDotnet.genruntimeconfig.cache
 /Users/vryzhov/dotnet_course/HelloDotnet/HelloDotnet/obj/Debug/net10.0/ref/HelloDotnet.dll
-/Users/vryzhov/dotnet_course/HelloDotnet/HelloDotnet/bin/Debug/net10.0/Newtonsoft.Json.dll
-/Users/vryzhov/dotnet_course/HelloDotnet/HelloDotnet/obj/Debug/net10.0/HelloDotnet.csproj.AssemblyReference.cache
-/Users/vryzhov/dotnet_course/HelloDotnet/HelloDotnet/obj/Debug/net10.0/HelloDot.AAA605C8.Up2Date

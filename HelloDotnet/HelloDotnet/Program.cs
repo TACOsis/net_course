@@ -8,13 +8,11 @@ class Program
 
     static void Main()
     {
-        CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("ru-RU");
-        
         while (true)
         {
             var line = Console.ReadLine() ?? "";
 
-            if (line == string.Empty) break;
+            if (string.IsNullOrWhiteSpace(line)) break;
 
             var splitLine = line.Split(" ", StringSplitOptions.RemoveEmptyEntries);
 
@@ -26,7 +24,7 @@ class Program
 
             var currentCategory = splitLine[0];
 
-            if (!decimal.TryParse(splitLine[1], CultureInfo.DefaultThreadCurrentCulture ,out var currentCategoryValue))
+            if (!decimal.TryParse(splitLine[1], CultureInfo.InvariantCulture ,out var currentCategoryValue) || currentCategoryValue <= 0)
             {
                 Console.WriteLine($"Не понял сумму {splitLine[1]}. Формат: категория сумма");
                 continue;
@@ -35,8 +33,8 @@ class Program
             AddCategory(currentCategory, currentCategoryValue);
         }
         
-        var totalSumCategories = CalculateTotalSumCategories();
-        var popularCategory =  CalculatePopularCategories();
+        var totalSumCategories = CalculateCategory();
+        var popularCategory =  PopularCategory();
         
         PrintCategories(popularCategory, totalSumCategories);
     }
@@ -49,7 +47,7 @@ class Program
         }
     }
 
-    private static decimal CalculateTotalSumCategories()
+    private static decimal CalculateCategory()
     {
         decimal totalSumCategories = 0.0m;
         foreach (var category in Categories)
@@ -60,9 +58,9 @@ class Program
         return totalSumCategories; 
     }
 
-    private static string CalculatePopularCategories()
+    private static string PopularCategory()
     {
-        var currentPopularCategory = Categories.FirstOrDefault().Key;
+        var currentPopularCategory = Categories.FirstOrDefault().Key ?? string.Empty;
         foreach (var category in Categories)
         {
             if (Categories[currentPopularCategory] < category.Value) 
