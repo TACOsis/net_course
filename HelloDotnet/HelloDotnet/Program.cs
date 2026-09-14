@@ -33,8 +33,8 @@ class Program
             AddExpense(categories, currentCategory, currentCategoryValue);
         }
         
-        var totalSumCategories = CalculateTotal(categories);
-        var popularCategory = FindTopCategory(categories) ?? "нет данных";
+        var totalSumCategories = categories.Sum(c => c.Value);
+        var popularCategory = categories.MaxBy(c => c.Value).Key;
 
         PrintCategories(categories, popularCategory, totalSumCategories);
     }
