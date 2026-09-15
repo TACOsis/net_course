@@ -37,11 +37,11 @@ class Program
         {
             Console.WriteLine("нет данных");
             return;
-        };
+        }
         
         var totalSumCategories = categories.Sum(c => c.Value);
         var popularCategory = categories.MaxBy(c => c.Value).Key;
-        var precentCategory = PrecentCategories(categories, totalSumCategories);
+        var precentCategory = PercentCategories(categories, totalSumCategories);
 
         PrintCategories(categories, precentCategory, popularCategory, totalSumCategories);
     }
@@ -54,13 +54,13 @@ class Program
         }
     }
 
-    private static IReadOnlyDictionary<string, decimal> PrecentCategories(IReadOnlyDictionary<string, decimal> categories, decimal totalSumCategories)
+    private static IReadOnlyDictionary<string, decimal> PercentCategories(IReadOnlyDictionary<string, decimal> categories, decimal totalSumCategories)
     {
         var precentCategory = new Dictionary<string, decimal>();
         decimal sumPrecentCategories = 0;
         foreach (var category in categories)
         {
-            var currentPercent = Math.Round(category.Value / totalSumCategories * 100);
+            var currentPercent = Math.Round(category.Value / totalSumCategories * 100, 2);
             if (categories.LastOrDefault().Key == category.Key)
             {
                 precentCategory.Add(category.Key, (100 - sumPrecentCategories));
@@ -71,32 +71,6 @@ class Program
         }
         return precentCategory;
     }
-
-    private static decimal CalculateTotal(IReadOnlyDictionary<string, decimal> categories)
-    {
-        decimal totalSumCategories = 0m;
-        foreach (var category in categories)
-        {
-            totalSumCategories += category.Value; 
-        }
-        return totalSumCategories; 
-    }
-
-    private static string? FindTopCategory(IReadOnlyDictionary<string, decimal> categories)
-    {
-        var currentPopularCategory = categories.FirstOrDefault().Key;
-        
-        foreach (var category in categories)
-        {
-            if (categories[currentPopularCategory] < category.Value) 
-            {
-                currentPopularCategory = category.Key;
-            }
-        }
-
-        return currentPopularCategory;
-    }
-
     private static void PrintCategories(IReadOnlyDictionary<string, decimal> categories, IReadOnlyDictionary<string, decimal> precentCategories, string popularCategory, decimal totalSumCategories)
     {
         const int countColumn = 3;
