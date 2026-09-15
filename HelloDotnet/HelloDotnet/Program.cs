@@ -32,6 +32,12 @@ class Program
 
             AddExpense(categories, currentCategory, currentCategoryValue);
         }
+
+        if (categories.Count == 0)
+        {
+            Console.WriteLine("нет данных");
+            return;
+        };
         
         var totalSumCategories = categories.Sum(c => c.Value);
         var popularCategory = categories.MaxBy(c => c.Value).Key;
@@ -96,7 +102,7 @@ class Program
         const int countColumn = 3;
         const int leftColumn = -15;
         const int rightColumn = 10;
-        int lineWidthRow = Math.Abs(leftColumn) + (rightColumn * (countColumn - 1));
+        var lineWidthRow = Math.Abs(leftColumn) + (rightColumn * (countColumn - 1));
 
         Console.WriteLine($"{"Категория",leftColumn}{"Сумма",rightColumn}{"Процент", rightColumn}");
         foreach (var category in categories)
