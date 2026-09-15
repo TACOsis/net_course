@@ -4,9 +4,9 @@ namespace HelloDotnet;
 
 class Program
 {
-    static void Main()
+    private static void Main()
     {
-        Dictionary<string, decimal> categories = new Dictionary<string, decimal>();
+        var categories = new Dictionary<string, decimal>();
         
         while (true)
         {
@@ -46,7 +46,7 @@ class Program
         PrintCategories(categories, precentCategory, popularCategory, totalSumCategories);
     }
 
-    static void AddExpense(Dictionary<string, decimal> categories, string categoryName, decimal categoryValue)
+    private static void AddExpense(Dictionary<string, decimal> categories, string categoryName, decimal categoryValue)
     {
         if (!categories.TryAdd(categoryName, categoryValue))
         {
@@ -57,11 +57,12 @@ class Program
     private static IReadOnlyDictionary<string, decimal> PercentCategories(IReadOnlyDictionary<string, decimal> categories, decimal totalSumCategories)
     {
         var precentCategory = new Dictionary<string, decimal>();
+        var lastKeyCategory = categories.Last().Key;
         decimal sumPrecentCategories = 0;
         foreach (var category in categories)
         {
             var currentPercent = Math.Round(category.Value / totalSumCategories * 100, 2);
-            if (categories.LastOrDefault().Key == category.Key)
+            if (lastKeyCategory == category.Key)
             {
                 precentCategory.Add(category.Key, (100 - sumPrecentCategories));
                 continue;
