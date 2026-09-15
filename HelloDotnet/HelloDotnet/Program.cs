@@ -4,7 +4,7 @@ namespace HelloDotnet;
 
 class Program
 {
-    private static void Main()
+    private static async Task Main()
     {
         var categories = new Dictionary<string, decimal>();
         
@@ -23,7 +23,6 @@ class Program
             }
 
             var currentCategory = splitLine[0];
-
             if (!decimal.TryParse(splitLine[1], CultureInfo.InvariantCulture ,out var currentCategoryValue) || currentCategoryValue <= 0)
             {
                 Console.WriteLine($"Не понял сумму {splitLine[1]}. Сумма не может быть отрицательной или состоять из букв.");
@@ -36,7 +35,7 @@ class Program
         if (categories.Count == 0)
         {
             Console.WriteLine("нет данных");
-            return;
+            return Task.CompletedTask;
         }
         
         var totalSumCategories = categories.Sum(c => c.Value);
@@ -44,6 +43,7 @@ class Program
         var precentCategory = PercentCategories(categories, totalSumCategories);
 
         PrintCategories(categories, precentCategory, popularCategory, totalSumCategories);
+        return Task.CompletedTask;
     }
 
     private static void AddExpense(Dictionary<string, decimal> categories, string categoryName, decimal categoryValue)
