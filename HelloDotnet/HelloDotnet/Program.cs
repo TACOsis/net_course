@@ -35,8 +35,9 @@ class Program
         
         var totalSumCategories = categories.Sum(c => c.Value);
         var popularCategory = categories.MaxBy(c => c.Value).Key;
+        var precentCategory = PrecentCategories(categories, totalSumCategories);
 
-        PrintCategories(categories, popularCategory, totalSumCategories);
+        PrintCategories(categories, precentCategory, popularCategory, totalSumCategories);
     }
 
     static void AddExpense(Dictionary<string, decimal> categories, string categoryName, decimal categoryValue)
@@ -45,6 +46,24 @@ class Program
         {
             categories[categoryName] += categoryValue;
         }
+    }
+
+    private static IReadOnlyDictionary<string, decimal> PrecentCategories(IReadOnlyDictionary<string, decimal> categories, decimal totalSumCategories)
+    {
+        var precentCategory = new Dictionary<string, decimal>();
+        decimal sumPrecentCategories = 0;
+        foreach (var category in categories)
+        {
+            var currentPercent = Math.Round(category.Value / totalSumCategories * 100);
+            if (categories.LastOrDefault().Key == category.Key)
+            {
+                precentCategory.Add(category.Key, (100 - sumPrecentCategories));
+                continue;
+            }
+            sumPrecentCategories += currentPercent;
+            precentCategory.Add(category.Key, currentPercent);
+        }
+        return precentCategory;
     }
 
     private static decimal CalculateTotal(IReadOnlyDictionary<string, decimal> categories)
@@ -72,29 +91,18 @@ class Program
         return currentPopularCategory;
     }
 
-    private static void PrintCategories(IReadOnlyDictionary<string, decimal> categories, string popularCategory, decimal totalSumCategories)
+    private static void PrintCategories(IReadOnlyDictionary<string, decimal> categories, IReadOnlyDictionary<string, decimal> precentCategories, string popularCategory, decimal totalSumCategories)
     {
         const int countColumn = 3;
         const int leftColumn = -15;
         const int rightColumn = 10;
         int lineWidthRow = Math.Abs(leftColumn) + (rightColumn * (countColumn - 1));
-        decimal sumPrecentCategories = 0;
 
         Console.WriteLine($"{"Категория",leftColumn}{"Сумма",rightColumn}{"Процент", rightColumn}");
         foreach (var category in categories)
         {
-            Console.Write($"{category.Key,leftColumn}{category.Value,rightColumn:F2}");
-            
-            decimal currentPercent = (category.Value / totalSumCategories * 100);
-            
-            if ((categories.LastOrDefault().Key ?? "") != category.Key)
-            {
-                sumPrecentCategories += currentPercent;
-                Console.WriteLine($"{currentPercent,rightColumn:F2}%");
-                continue;
-            }
+            Console.WriteLine($"{category.Key,leftColumn}{category.Value,rightColumn:F2}{precentCategories[category.Key], rightColumn:F2}%");
 
-            Console.WriteLine($"{100 - sumPrecentCategories,rightColumn:F2}%");
         }
         Console.WriteLine(new string('-', lineWidthRow));
         Console.WriteLine($"{"Итого:",leftColumn}{totalSumCategories,rightColumn:F2}");
