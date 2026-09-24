@@ -16,28 +16,17 @@ public class TodoService
         var items = await storage.LoadAsync();
         return new TodoService(storage, items);
     }
-    
-    public Task<List<TodoItem>> LoadAsync(string? path = null)
-    {
-        return _storage.LoadAsync(path);
-    }
-
-    public async Task SaveAsync(IReadOnlyList<TodoItem> items)
-    {
-        await _storage.SaveAsync(items);
-    }
 
     public async Task<TodoItem> AddAsync(string? title, DateOnly? dueDate)
     {
         if (title == null || string.IsNullOrWhiteSpace(title)) throw new ArgumentException("Title cannot be null or whitespace.", nameof(title));
-
-        if (dueDate == null) throw new ArgumentException("Due Date cannot be null.", nameof(dueDate));
-
+        
         var item = new TodoItem()
         {
             Id = Guid.NewGuid(),
             Title = title,
-            DueAt = dueDate,
+            Status = TodoStatus.New,
+            CreatedAt = DateTimeOffset.UtcNow,
         };
         
         _items.Add(item);

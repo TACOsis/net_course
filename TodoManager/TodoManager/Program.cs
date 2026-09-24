@@ -9,11 +9,20 @@ public class Program
     {
         Console.OutputEncoding = Encoding.UTF8;
 
-        var path = "/Users/vryzhov/dotnet_course/TodoManager/TodoManager/obj/Debug/todoList.json";
-        
-        var jsonTodoStorage = new JsonTodoStorage(path);
-        var todoService = await TodoService.CreateAsync(jsonTodoStorage);
+        var path = "/Users/vryzhov/dotnet_course/TodoManager/TodoManager/obj/Debug/net10.0/TodoList.json";
 
-        await todoService.AddAsync("Test", new DateOnly(2026, 9, 12));
+        JsonTodoStorage jsonTodoStorage;
+
+        try
+        { 
+            jsonTodoStorage = new JsonTodoStorage(path);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+            throw;
+        }
+        var todoService = await TodoService.CreateAsync(jsonTodoStorage);
+        
     }
 }

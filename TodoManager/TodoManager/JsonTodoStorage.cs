@@ -1,5 +1,3 @@
-using System.IO;
-using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 
@@ -11,36 +9,49 @@ public class JsonTodoStorage : ITodoStorage
 
     public JsonTodoStorage(string path)
     {
+        if (string.IsNullOrEmpty(path)) throw new ArgumentException("Path is empty");
+        
         _path = path;
     }
     
-    public async Task<List<TodoItem>> LoadAsync(string? setting = null)
-    { 
-        if (string.IsNullOrEmpty(_path)) return [];
-
-        if (string.IsNullOrWhiteSpace(_path) || !File.Exists(_path)) return [];
-        
+    public async Task<List<TodoItem>> LoadAsync()
+    {
+        var fileName = Path.GetFileNameWithoutExtension(_path);
         await using var stream = File.OpenRead(_path);
-        
-        var items = JsonSerializer.Deserialize<List<TodoItem>>(stream);
-
+        List<TodoItem>? items;
+        try
+        {
+            items =  await JsonSerializer.DeserializeAsync<List<TodoItem>>(stream);
+        }
+        catch
+        {
+            var content = await File.ReadAllTextAsync(_path);
+            
+            if (string.IsNullOrEmpty(content)) return [];
+            
+            var currentDirectory = Path.GetDirectoryName(_path);
+            var backupDirectory= $"{currentDirectory}/backup";
+            var backup = $"{backupDirectory}/{fileName}.corrupt-{DateTime.UtcNow:yyyyMMdd-HHmmss}";
+            
+            if (!Directory.Exists(backupDirectory)) Directory.CreateDirectory(backupDirectory);
+            
+            File.Move(_path, backup);
+            await File.Create(_path).DisposeAsync();
+            
+            throw new TodoStorageException($"Файл с задачами повреждён. Копия сохранена как {backup}\nНачинаю с пустого списка.", backup);
+        }
         return items ?? [];
     }
 
     public async Task SaveAsync(IReadOnlyList<TodoItem> items)
     {
-        if (string.IsNullOrEmpty(_path) || string.IsNullOrWhiteSpace(_path) || !File.Exists(_path))
-        {
-            throw new Exception("Path is empty");
-        }
-        
         var options = new JsonSerializerOptions
         {
             Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
             WriteIndented = true
         };
         
-        var itemsJson = JsonSerializer.Serialize<IReadOnlyList<TodoItem>>(items, options);
+        var itemsJson = JsonSerializer.Serialize(items, options);
         
         await File.WriteAllTextAsync(_path, itemsJson);
     }
