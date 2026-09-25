@@ -1,14 +1,23 @@
 using System.Text.Encodings.Web;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace TodoManager;
 
 public class JsonTodoStorage : ITodoStorage
 {
     private readonly string _path;
+    private readonly JsonSerializerOptions _optionsJson;
 
     public JsonTodoStorage(string path)
     {
+        _optionsJson = new JsonSerializerOptions()
+        {
+            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+            WriteIndented = true
+        };
+        _optionsJson.Converters.Add(new JsonStringEnumConverter());
+        
         if (string.IsNullOrEmpty(path)) throw new ArgumentException("Path is empty");
         
         _path = path;
@@ -16,12 +25,14 @@ public class JsonTodoStorage : ITodoStorage
     
     public async Task<List<TodoItem>> LoadAsync()
     {
+        if (!File.Exists(_path)) return [];
+        
         var fileName = Path.GetFileNameWithoutExtension(_path);
         await using var stream = File.OpenRead(_path);
         List<TodoItem>? items;
         try
         {
-            items =  await JsonSerializer.DeserializeAsync<List<TodoItem>>(stream);
+            items =  await JsonSerializer.DeserializeAsync<List<TodoItem>>(stream, _optionsJson);
         }
         catch
         {
@@ -29,14 +40,11 @@ public class JsonTodoStorage : ITodoStorage
             
             if (string.IsNullOrEmpty(content)) return [];
             
-            var currentDirectory = Path.GetDirectoryName(_path);
-            var backupDirectory= $"{currentDirectory}/backup";
-            var backup = $"{backupDirectory}/{fileName}.corrupt-{DateTime.UtcNow:yyyyMMdd-HHmmss}";
+            var backup = $"backup/{fileName}.corrupt-{DateTime.UtcNow:yyyyMMdd-HHmmss}";
             
-            if (!Directory.Exists(backupDirectory)) Directory.CreateDirectory(backupDirectory);
+            if (!Directory.Exists("backup")) Directory.CreateDirectory("backup");
             
             File.Move(_path, backup);
-            await File.Create(_path).DisposeAsync();
             
             throw new TodoStorageException($"Файл с задачами повреждён. Копия сохранена как {backup}\nНачинаю с пустого списка.", backup);
         }
@@ -45,13 +53,12 @@ public class JsonTodoStorage : ITodoStorage
 
     public async Task SaveAsync(IReadOnlyList<TodoItem> items)
     {
-        var options = new JsonSerializerOptions
+        var itemsJson = JsonSerializer.Serialize(items, _optionsJson);
+
+        if (!File.Exists(_path))
         {
-            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-            WriteIndented = true
-        };
-        
-        var itemsJson = JsonSerializer.Serialize(items, options);
+            File.Create(_path).Close();
+        }
         
         await File.WriteAllTextAsync(_path, itemsJson);
     }

@@ -26,7 +26,8 @@ public class TodoService
             Id = Guid.NewGuid(),
             Title = title,
             Status = TodoStatus.New,
-            CreatedAt = DateTimeOffset.UtcNow,
+            DueAt = dueDate,
+            CreatedAt = DateTime.UtcNow,
         };
         
         _items.Add(item);

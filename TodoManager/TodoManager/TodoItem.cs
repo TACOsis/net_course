@@ -7,5 +7,5 @@ public class TodoItem
     public TodoStatus Status { get; set; }
     public required DateTimeOffset CreatedAt { get; set; }
     public DateOnly? DueAt { get; set; }
-    public DateTimeOffset? CompletedAt { get; set; }
+    public DateOnly? CompletedAt { get; set; }
 }
