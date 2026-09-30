@@ -19,12 +19,12 @@ public class TodoService
 
     public async Task<TodoItem> AddAsync(string? title, DateOnly? dueDate)
     {
-        if (title == null || string.IsNullOrWhiteSpace(title)) throw new ArgumentException("Title cannot be null or whitespace.", nameof(title));
+        if (string.IsNullOrWhiteSpace(title)) throw new ArgumentException("Title cannot be null or whitespace.", nameof(title));
         
         var item = new TodoItem()
         {
             Id = Guid.NewGuid(),
-            Title = title,
+            Title = title.Trim(),
             Status = TodoStatus.New,
             DueAt = dueDate,
             CreatedAt = DateTime.UtcNow,

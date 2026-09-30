@@ -28,19 +28,21 @@ public class JsonTodoStorage : ITodoStorage
         if (!File.Exists(_path)) return [];
         
         var fileName = Path.GetFileNameWithoutExtension(_path);
-        await using var stream = File.OpenRead(_path);
+        var contentJson = await File.ReadAllTextAsync(_path);
         List<TodoItem>? items;
         try
         {
-            items =  await JsonSerializer.DeserializeAsync<List<TodoItem>>(stream, _optionsJson);
+            
+            items =  JsonSerializer.Deserialize<List<TodoItem>>(contentJson, _optionsJson);
         }
         catch
         {
             var content = await File.ReadAllTextAsync(_path);
+            var currentDirectory = Directory.GetCurrentDirectory();
             
             if (string.IsNullOrEmpty(content)) return [];
             
-            var backup = $"backup/{fileName}.corrupt-{DateTime.UtcNow:yyyyMMdd-HHmmss}";
+            var backup = $"{currentDirectory}/backup/{fileName}.corrupt-{DateTime.UtcNow:yyyyMMdd-HHmmss}";
             
             if (!Directory.Exists("backup")) Directory.CreateDirectory("backup");
             
@@ -54,11 +56,6 @@ public class JsonTodoStorage : ITodoStorage
     public async Task SaveAsync(IReadOnlyList<TodoItem> items)
     {
         var itemsJson = JsonSerializer.Serialize(items, _optionsJson);
-
-        if (!File.Exists(_path))
-        {
-            File.Create(_path).Close();
-        }
         
         await File.WriteAllTextAsync(_path, itemsJson);
     }
